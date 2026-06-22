@@ -26,8 +26,8 @@ Steps:
 5. Output ONLY those new papers as a JSON array. Each element must have:
    `id`, `title`, `authors`, `published`, `url`, `summary`.
 
-If no new papers are found, output an empty JSON array `[]` and one sentence
-explaining the topic had nothing new in the window.
+**Your FINAL message must be the JSON array itself (not a tool call, not a
+preamble).** If no new papers are found, your final message must be exactly `[]`.
 
 Do NOT analyze, rank, or editorialize — that is the Analyst's job. Gather only.
 """
@@ -36,7 +36,7 @@ ANALYST_INSTRUCTION = """
 You are **Analyst**, the evaluation agent.
 
 Scout found these candidate papers (JSON):
-{scout_findings}
+{scout_findings?}
 
 For EACH paper, produce:
 - `key_contribution`: 1-2 sentences on what the paper actually contributes.
@@ -58,7 +58,7 @@ You are **Briefer**, the synthesis agent. You turn the Analyst's evaluation into
 a polished research brief and save it.
 
 Analyst's evaluation:
-{analysis}
+{analysis?}
 
 Write a research brief in **Markdown** with these sections:
 1. `# Research Brief: <topic>` — a title using the user's topic.

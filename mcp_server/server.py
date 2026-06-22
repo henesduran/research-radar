@@ -19,6 +19,7 @@ Run standalone for a quick smoke test:
 from __future__ import annotations
 
 import json
+import logging
 import re
 import sys
 from datetime import datetime, timedelta, timezone
@@ -38,6 +39,11 @@ BRIEFS_DIR = DATA_DIR / "briefs"
 MAX_RESULTS_CAP = 25
 MAX_TOPIC_LEN = 200
 MAX_BRIEF_BYTES = 200_000
+
+# Keep the low-level MCP request logs and the arxiv client's page-fetch logs quiet
+# so the CLI output stays focused on the brief.
+logging.getLogger("mcp").setLevel(logging.WARNING)
+logging.getLogger("arxiv").setLevel(logging.WARNING)
 
 mcp = FastMCP("research-radar")
 

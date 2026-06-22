@@ -1,5 +1,10 @@
 # 🔭 Research Radar
 
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Built with Google ADK](https://img.shields.io/badge/built%20with-Google%20ADK-4285F4)
+![Tools via MCP](https://img.shields.io/badge/tools-MCP-6E56CF)
+![License: MIT](https://img.shields.io/badge/license-MIT-green)
+
 **Enter a research topic. Get back a cited, analyzed literature brief — and only the papers you haven't seen before.**
 
 Research Radar is a multi-agent system built with [Google's Agent Development Kit (ADK)](https://google.github.io/adk-docs/). It scouts arXiv for the most relevant recent work on a topic, evaluates and ranks each paper, synthesizes a structured Markdown brief, and remembers what it already showed you so every re-run surfaces *new* literature.
@@ -115,8 +120,9 @@ GOOGLE_GENAI_USE_VERTEXAI=FALSE
 **CLI (one-shot brief):**
 ```bash
 python radar.py "retrieval augmented generation evaluation"
+python radar.py "diffusion models for audio" --retries 3   # auto-retry on transient errors
 ```
-The brief prints to the console and is saved to `data/briefs/`. Run the same topic again later to get only newly-published / not-yet-seen papers.
+The brief prints to the console and is saved to `data/briefs/`. Run the same topic again later to get only newly-published / not-yet-seen papers. The CLI prints clear, actionable messages for the common failure modes (quota, network, bad key) and exits non-zero on failure so it composes with scripts.
 
 **Interactive dev UI (ADK):**
 ```bash
@@ -128,6 +134,16 @@ Then open the printed URL, pick `research_radar`, and type a topic. The UI shows
 
 ---
 
+## Testing
+
+Unit tests cover the MCP server's logic (input clamping, dedupe, state) and the
+agent pipeline's wiring. They run fully offline — no network, no API key.
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
 ## Project structure
 
 ```
@@ -138,9 +154,15 @@ Then open the printed URL, pick `research_radar`, and type a topic. The UI shows
 │   └── __init__.py
 ├── mcp_server/
 │   └── server.py            # FastMCP server: arXiv search + brief/seen store
-├── radar.py                 # headless CLI runner
+├── tests/                   # offline unit tests (pytest)
+│   ├── test_server.py
+│   └── test_agent.py
+├── radar.py                 # CLI runner (argparse + graceful error handling)
 ├── data/                    # generated briefs + dedupe state (git-ignored)
-├── requirements.txt
+├── requirements.txt         # runtime dependencies
+├── requirements-dev.txt     # + test dependencies
+├── pyproject.toml           # pytest configuration
+├── LICENSE                  # MIT
 └── .env.example
 ```
 

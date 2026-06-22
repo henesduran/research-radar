@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+# ADK emits forward-looking deprecation warnings (e.g. a future "Workflow" API that
+# isn't shipped yet); silence them so the test output stays readable.
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

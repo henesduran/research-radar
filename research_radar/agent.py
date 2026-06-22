@@ -30,7 +30,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from google.adk.agents import LlmAgent, SequentialAgent
-from google.adk.tools.mcp_tool import MCPToolset, StdioConnectionParams
+from google.adk.tools.mcp_tool import McpToolset, StdioConnectionParams
 from google.adk.tools.mcp_tool.mcp_session_manager import StdioServerParameters
 
 from . import prompts
@@ -51,9 +51,9 @@ MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
 _MCP_SERVER = str(_ROOT / "mcp_server" / "server.py")
 
 
-def _toolset(tool_names: list[str]) -> MCPToolset:
+def _toolset(tool_names: list[str]) -> McpToolset:
     """Connect to our MCP server over stdio, exposing only `tool_names`."""
-    return MCPToolset(
+    return McpToolset(
         connection_params=StdioConnectionParams(
             server_params=StdioServerParameters(
                 command=sys.executable,
@@ -92,6 +92,9 @@ briefer = LlmAgent(
 )
 
 # The root agent ADK looks for. Runs Scout -> Analyst -> Briefer in sequence.
+# Note: ADK 2.3 emits a forward-looking deprecation pointing to a future "Workflow"
+# API that does not exist in this version yet, so SequentialAgent remains the correct
+# choice here.
 root_agent = SequentialAgent(
     name="research_radar",
     description="Topic in, cited research brief out: scouts arXiv, analyzes, and writes a brief.",
