@@ -1,5 +1,6 @@
 # 🔭 Research Radar
 
+![CI](https://github.com/henesduran/research-radar/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Built with Google ADK](https://img.shields.io/badge/built%20with-Google%20ADK-4285F4)
 ![Tools via MCP](https://img.shields.io/badge/tools-MCP-6E56CF)
@@ -134,6 +135,14 @@ Then open the printed URL, pick `research_radar`, and type a topic. The UI shows
 
 ---
 
+## Example output
+
+A real brief produced by `python radar.py "graph neural networks for drug discovery"` is saved in [`examples/sample-brief.md`](examples/sample-brief.md). A snippet:
+
+> **Executive summary** — This brief synthesizes recent advancements in applying Graph Neural Networks (GNNs) and related AI techniques to drug discovery … with ongoing research focusing on novel architectures, efficiency, and robust evaluation.
+>
+> **Top Papers** — RAG-Enhanced Collaborative LLM Agents for Drug Discovery · Domain Knowledge Infused Conditional Generative Models · MECCH: Metapath Context Convolution-based HGNNs · Transformers are Graph Neural Networks · …
+
 ## Testing
 
 Unit tests cover the MCP server's logic (input clamping, dedupe, state) and the
@@ -143,6 +152,28 @@ agent pipeline's wiring. They run fully offline — no network, no API key.
 pip install -r requirements-dev.txt
 pytest
 ```
+
+## Deployment
+
+The agent is container-ready. The `Dockerfile` serves the ADK agents over HTTP, so it
+deploys cleanly to **Google Cloud Run** (or any container host):
+
+```bash
+# Build and run locally
+docker build -t research-radar .
+docker run -p 8080:8080 -e GOOGLE_API_KEY=your_key research-radar
+
+# Deploy to Google Cloud Run (requires a GCP project + gcloud)
+gcloud run deploy research-radar \
+  --source . \
+  --set-env-vars GOOGLE_GENAI_USE_VERTEXAI=FALSE \
+  --set-secrets GOOGLE_API_KEY=GEMINI_KEY:latest \
+  --allow-unauthenticated
+```
+
+Live deployment is optional — the project runs fully from the CLI; the container just
+makes it portable. **Never bake your API key into the image** — pass it as an environment
+variable or secret at run time.
 
 ## Project structure
 
@@ -157,7 +188,11 @@ pytest
 ├── tests/                   # offline unit tests (pytest)
 │   ├── test_server.py
 │   └── test_agent.py
+├── examples/
+│   └── sample-brief.md      # a real generated brief
+├── .github/workflows/ci.yml # runs the tests on every push (GitHub Actions)
 ├── radar.py                 # CLI runner (argparse + graceful error handling)
+├── Dockerfile               # container image (Cloud Run ready)
 ├── data/                    # generated briefs + dedupe state (git-ignored)
 ├── requirements.txt         # runtime dependencies
 ├── requirements-dev.txt     # + test dependencies

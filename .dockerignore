@@ -1,0 +1,11 @@
+# Keep the image small and free of secrets/local cruft.
+.venv/
+.env
+data/
+docs/
+.git/
+.github/
+__pycache__/
+*.pyc
+.pytest_cache/
+.gstack/
