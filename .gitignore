@@ -5,20 +5,12 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 
-# Secrets — NEVER commit API keys
+# Secrets — never commit API keys
 .env
 
-# Generated data (briefs, seen-state)
+# Generated data (briefs, dedupe state)
 data/
-
-# Local tooling (not part of the project)
-CLAUDE.md
-.claude/
-
-# Personal study + working drafts — kept local, not published
-docs/
 
 # OS
 .DS_Store
 Thumbs.db
-.gstack/
