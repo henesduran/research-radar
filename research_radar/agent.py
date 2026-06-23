@@ -1,4 +1,4 @@
-"""Research Radar — ADK multi-agent pipeline.
+"""Research Radar - ADK multi-agent pipeline.
 
 Architecture (a SequentialAgent runs these three specialists in order, passing
 results through shared session state):
@@ -40,7 +40,7 @@ _ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(_ROOT / ".env")
 
 # Gemini model. Default to 2.5-flash-lite: fast, capable enough for this task,
-# and the most generous free tier of the current flash models — important since
+# and the most generous free tier of the current flash models - important since
 # each pipeline run makes several model calls. gemini-2.5-flash is higher quality
 # but has a much smaller free tier (~20 requests/day). Override with GEMINI_MODEL
 # in .env (e.g. GEMINI_MODEL=gemini-2.5-flash for the highest-quality brief).

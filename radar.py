@@ -1,4 +1,4 @@
-"""Research Radar — command-line interface.
+"""Research Radar - command-line interface.
 
 Runs the Scout -> Analyst -> Briefer pipeline for a topic and streams each agent's
 output. The finished brief is saved by the Briefer via the MCP server (data/briefs/).
@@ -103,12 +103,12 @@ async def run(topic: str, retries: int = 2) -> int:
             print("\n" + "=" * 64)
             print("✅ Done. Brief saved under data/briefs/.")
             return 0
-        except Exception as err:  # noqa: BLE001 — top-level CLI guard
+        except Exception as err:  # noqa: BLE001 - top-level CLI guard
             if _is_transient(err) and attempt < retries:
                 attempt += 1
                 wait = 5 * attempt
                 print(f"\n⏳ Temporary error; retrying in {wait}s "
-                      f"(attempt {attempt}/{retries})…")
+                      f"(attempt {attempt}/{retries})...")
                 await asyncio.sleep(wait)
                 continue
             print("\n" + "=" * 64)

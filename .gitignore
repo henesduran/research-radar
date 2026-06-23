@@ -5,7 +5,7 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 
-# Secrets — never commit API keys
+# Secrets - never commit API keys
 .env
 
 # Generated data (briefs, dedupe state)
@@ -14,3 +14,4 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+.gstack/

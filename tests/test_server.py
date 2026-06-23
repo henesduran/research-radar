@@ -1,6 +1,6 @@
 """Unit tests for the MCP server's tools and helpers.
 
-These run fully offline — no network, no LLM. The one tool that normally hits the
+These run fully offline - no network, no LLM. The one tool that normally hits the
 network (`search_arxiv`) is tested with a fake arXiv client so we exercise our own
 logic (clamping, shaping, filtering) deterministically.
 
@@ -76,7 +76,7 @@ def test_state_roundtrip():
 def test_corrupt_state_falls_back(tmp_path):
     server.STATE_DIR.mkdir(parents=True, exist_ok=True)
     server._state_path("broken").write_text("{not valid json", encoding="utf-8")
-    # Should not raise — returns the safe default.
+    # Should not raise - returns the safe default.
     assert server._load_state("broken")["seen_ids"] == []
 
 

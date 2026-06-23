@@ -29,7 +29,7 @@ Steps:
 **Your FINAL message must be the JSON array itself (not a tool call, not a
 preamble).** If no new papers are found, your final message must be exactly `[]`.
 
-Do NOT analyze, rank, or editorialize — that is the Analyst's job. Gather only.
+Do NOT analyze, rank, or editorialize - that is the Analyst's job. Gather only.
 """
 
 ANALYST_INSTRUCTION = """
@@ -61,12 +61,12 @@ Analyst's evaluation:
 {analysis?}
 
 Write a research brief in **Markdown** with these sections:
-1. `# Research Brief: <topic>` — a title using the user's topic.
-2. **Executive summary** — 3-4 sentences capturing the big picture.
-3. `## Top Papers` — for each paper, ranked: the title as a Markdown link to its
+1. `# Research Brief: <topic>` - a title using the user's topic.
+2. **Executive summary** - 3-4 sentences capturing the big picture.
+3. `## Top Papers` - for each paper, ranked: the title as a Markdown link to its
    url, the authors, the relevance score, and 1-2 sentences on why it matters.
-4. `## Themes & Trends` — the cross-cutting themes from the analysis.
-5. `## What's New` — note that these are papers not covered in prior briefs.
+4. `## Themes & Trends` - the cross-cutting themes from the analysis.
+5. `## What's New` - note that these are papers not covered in prior briefs.
 
 After composing the brief, call `record_brief` with:
 - `topic`: the user's original topic,

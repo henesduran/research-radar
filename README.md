@@ -6,7 +6,7 @@
 ![Tools via MCP](https://img.shields.io/badge/tools-MCP-6E56CF)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
-**Enter a research topic. Get back a cited, analyzed literature brief — and only the papers you haven't seen before.**
+**Enter a research topic. Get back a cited, analyzed literature brief - and only the papers you haven't seen before.**
 
 Research Radar is a multi-agent system built with [Google's Agent Development Kit (ADK)](https://google.github.io/adk-docs/). It scouts arXiv for the most relevant recent work on a topic, evaluates and ranks each paper, synthesizes a structured Markdown brief, and remembers what it already showed you so every re-run surfaces *new* literature.
 
@@ -16,7 +16,7 @@ Research Radar is a multi-agent system built with [Google's Agent Development Ki
 
 ## The problem
 
-Keeping up with a research area is a chore. arXiv posts hundreds of papers a day; a keyword search returns a firehose sorted by date, full of loosely-matching noise. Researchers, students, and engineers waste hours triaging titles to find the few papers that actually matter — and the next week they do it again, re-reading the same results.
+Keeping up with a research area is a chore. arXiv posts hundreds of papers a day; a keyword search returns a firehose sorted by date, full of loosely-matching noise. Researchers, students, and engineers waste hours triaging titles to find the few papers that actually matter - and the next week they do it again, re-reading the same results.
 
 A plain "summarize arXiv" script doesn't solve this. It can't judge relevance, it can't track what you've already seen, and it dumps a wall of text instead of a usable brief.
 
@@ -27,10 +27,10 @@ Research Radar treats literature review as a **pipeline of specialized agents**,
 | Agent | Role | Tools |
 |-------|------|-------|
 | **Scout** | Finds the most relevant papers for the topic and filters out anything already covered in past briefs | `search_arxiv`, `get_seen_paper_ids` (MCP) |
-| **Analyst** | Scores each paper's relevance (1–5), extracts its key contribution, and identifies cross-cutting themes | *(pure reasoning)* |
+| **Analyst** | Scores each paper's relevance (1-5), extracts its key contribution, and identifies cross-cutting themes | *(pure reasoning)* |
 | **Briefer** | Writes the polished Markdown brief and persists it, marking its papers as "seen" | `record_brief`, `list_past_briefs` (MCP) |
 
-The agents never touch arXiv or the filesystem directly — they go through a **custom MCP (Model Context Protocol) server**, which is the project's single trusted tool boundary. Each agent is granted *only* the tools it needs (least privilege).
+The agents never touch arXiv or the filesystem directly - they go through a **custom MCP (Model Context Protocol) server**, which is the project's single trusted tool boundary. Each agent is granted *only* the tools it needs (least privilege).
 
 The result: re-run the same topic next week and Scout silently skips everything you've already read, so the brief is always "what's new for *you*."
 
@@ -84,10 +84,10 @@ user topic
 
 ## Course concepts demonstrated
 
-- ✅ **Agent / Multi-agent system (ADK)** — `SequentialAgent` orchestrating three `LlmAgent` specialists with state hand-off.
-- ✅ **MCP Server** — a custom `FastMCP` server (`mcp_server/server.py`) exposing four tools over stdio, consumed by ADK via `MCPToolset`.
-- ✅ **Security features** — secrets kept in `.env` (git-ignored, never in code); per-agent least-privilege tool scoping; input validation and caps in every MCP tool (max results, topic length, brief size); the agents cannot read arbitrary files — only the MCP tools' fixed `data/` paths.
-- ➕ **Antigravity** — developed/iterated in Google's Antigravity IDE (shown in the demo video).
+- ✅ **Agent / Multi-agent system (ADK)** - `SequentialAgent` orchestrating three `LlmAgent` specialists with state hand-off.
+- ✅ **MCP Server** - a custom `FastMCP` server (`mcp_server/server.py`) exposing four tools over stdio, consumed by ADK via `MCPToolset`.
+- ✅ **Security features** - secrets kept in `.env` (git-ignored, never in code); per-agent least-privilege tool scoping; input validation and caps in every MCP tool (max results, topic length, brief size); the agents cannot read arbitrary files - only the MCP tools' fixed `data/` paths.
+- ➕ **Antigravity** - developed/iterated in Google's Antigravity IDE (shown in the demo video).
 
 ---
 
@@ -129,7 +129,7 @@ The brief prints to the console and is saved to `data/briefs/`. Run the same top
 ```bash
 adk web
 ```
-Then open the printed URL, pick `research_radar`, and type a topic. The UI shows each agent and tool call in sequence — great for understanding the flow.
+Then open the printed URL, pick `research_radar`, and type a topic. The UI shows each agent and tool call in sequence - great for understanding the flow.
 
 > **Model note:** the default model is `gemini-2.5-flash-lite` (fast, generous free tier). For the highest-quality brief, set `GEMINI_MODEL=gemini-2.5-flash` in `.env` (smaller free quota).
 
@@ -139,14 +139,14 @@ Then open the printed URL, pick `research_radar`, and type a topic. The UI shows
 
 A real brief produced by `python radar.py "graph neural networks for drug discovery"` is saved in [`examples/sample-brief.md`](examples/sample-brief.md). A snippet:
 
-> **Executive summary** — This brief synthesizes recent advancements in applying Graph Neural Networks (GNNs) and related AI techniques to drug discovery … with ongoing research focusing on novel architectures, efficiency, and robust evaluation.
+> **Executive summary** - This brief synthesizes recent advancements in applying Graph Neural Networks (GNNs) and related AI techniques to drug discovery ... with ongoing research focusing on novel architectures, efficiency, and robust evaluation.
 >
-> **Top Papers** — RAG-Enhanced Collaborative LLM Agents for Drug Discovery · Domain Knowledge Infused Conditional Generative Models · MECCH: Metapath Context Convolution-based HGNNs · Transformers are Graph Neural Networks · …
+> **Top Papers**: RAG-Enhanced Collaborative LLM Agents for Drug Discovery, Domain Knowledge Infused Conditional Generative Models, MECCH (Metapath Context Convolution HGNNs), Transformers are Graph Neural Networks, and more.
 
 ## Testing
 
 Unit tests cover the MCP server's logic (input clamping, dedupe, state) and the
-agent pipeline's wiring. They run fully offline — no network, no API key.
+agent pipeline's wiring. They run fully offline - no network, no API key.
 
 ```bash
 pip install -r requirements-dev.txt
@@ -171,8 +171,8 @@ gcloud run deploy research-radar \
   --allow-unauthenticated
 ```
 
-Live deployment is optional — the project runs fully from the CLI; the container just
-makes it portable. **Never bake your API key into the image** — pass it as an environment
+Live deployment is optional - the project runs fully from the CLI; the container just
+makes it portable. **Never bake your API key into the image** - pass it as an environment
 variable or secret at run time.
 
 ## Project structure
@@ -204,7 +204,7 @@ variable or secret at run time.
 ## Security notes
 
 - **No secrets in code.** The API key is read from `.env`, which is git-ignored.
-- **Least privilege.** Scout can search but not write; Briefer can write but not search — enforced with MCP `tool_filter`.
+- **Least privilege.** Scout can search but not write; Briefer can write but not search - enforced with MCP `tool_filter`.
 - **Bounded tools.** Every MCP tool clamps its inputs (result counts, topic length, stored-brief size) so a malformed agent request can't run away.
 - **No arbitrary file/network access from agents.** All I/O is mediated by the MCP server's fixed tool set.
 

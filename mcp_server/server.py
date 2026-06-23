@@ -1,4 +1,4 @@
-"""Research Radar — MCP server.
+"""Research Radar - MCP server.
 
 Exposes the agent's external capabilities as Model Context Protocol (MCP) tools
 over stdio. The ADK agents never touch arXiv or the filesystem directly; they go
@@ -86,7 +86,7 @@ def search_arxiv(topic: str, max_results: int = 10, days: int = 0) -> list[dict]
         topic: Natural-language research topic, e.g. "LLM agent planning".
         max_results: How many papers to return (1-25).
         days: If > 0, only include papers submitted within this many days.
-            Use 0 (default) for no date filter — best for a literature review.
+            Use 0 (default) for no date filter - best for a literature review.
 
     Returns:
         A list of papers, most relevant first. Each item has: id (arXiv short id),

@@ -26,7 +26,7 @@ def test_state_handoff_keys():
 
 def test_least_privilege_tooling():
     by_name = {a.name: a for a in agent.root_agent.sub_agents}
-    # The Analyst is a pure reasoner — it should have no tools.
+    # The Analyst is a pure reasoner - it should have no tools.
     assert not by_name["Analyst"].tools
     # Scout and Briefer each get a toolset (search vs. write).
     assert by_name["Scout"].tools
