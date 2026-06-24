@@ -109,6 +109,22 @@ def index_papers(topic: str, papers: list[dict]) -> dict:
     return {"indexed": len(new), "total": col.count()}
 
 
+def close() -> None:
+    """Release the Chroma client (and its SQLite handle) so another process can
+    open the same store. The MCP server runs in a separate process, so after the
+    main process indexes papers it must release the store before the server queries
+    it - otherwise the server's read blocks on the open SQLite file.
+    """
+    global _chroma_client
+    try:
+        from chromadb.api.shared_system_client import SharedSystemClient
+
+        SharedSystemClient.clear_system_cache()
+    except Exception:
+        pass
+    _chroma_client = None
+
+
 def query(topic: str, question: str, k: int = 5) -> list[dict]:
     """Return the k papers whose embeddings are closest to the question.
 

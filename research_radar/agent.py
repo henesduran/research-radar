@@ -92,13 +92,30 @@ briefer = LlmAgent(
 )
 
 # Standalone RAG agent (used by ask.py, not part of the brief pipeline). It answers
-# questions using only the papers retrieved from the vector store via semantic_search.
+# questions using only the papers retrieved from the vector store.
+#
+# This one tool runs IN-PROCESS (a plain function, not the MCP server) on purpose:
+# ask.py indexes papers into ChromaDB in the same process, and a local SQLite-backed
+# vector store cannot be safely opened by a second process at the same time. Keeping
+# retrieval in-process sidesteps that cross-process lock. (The MCP server still exposes
+# the same tools for the pipeline architecture and the tests.)
+def semantic_search(topic: str, query: str, k: int = 6) -> list[dict]:
+    """Find the k papers most relevant to a question using vector similarity.
+
+    Returns a list of {id, title, url, authors, text, distance}. Use the returned
+    text and url to write a cited answer. Returns [] if nothing is indexed yet.
+    """
+    from mcp_server import rag
+
+    return rag.query(topic, query, k)
+
+
 researcher = LlmAgent(
     name="Researcher",
     model=MODEL,
     description="Answers questions about a topic using retrieved papers, with citations.",
     instruction=prompts.RESEARCHER_INSTRUCTION,
-    tools=[_toolset(["semantic_search"])],
+    tools=[semantic_search],
     output_key="answer",
 )
 
