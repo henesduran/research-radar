@@ -28,6 +28,14 @@ from pathlib import Path
 import arxiv
 from mcp.server.fastmcp import FastMCP
 
+# RAG layer. The dual import lets this file work both as a script
+# (`python mcp_server/server.py`, where sys.path[0] is this folder) and as a
+# package module (`from mcp_server import server`, used by the tests).
+try:
+    from mcp_server import rag
+except ImportError:
+    import rag
+
 # Data lives next to the repo root, independent of the process working directory
 # (the agent launches this server as a subprocess, so we can't rely on cwd).
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -170,6 +178,29 @@ def record_brief(topic: str, paper_ids: list[str], brief_markdown: str) -> dict:
 def list_past_briefs(topic: str) -> list[dict]:
     """List metadata for briefs already generated for this topic (newest last)."""
     return _load_state(topic).get("briefs", [])
+
+
+@mcp.tool()
+def index_papers(topic: str, papers: list[dict]) -> dict:
+    """Embed and store papers for a topic so they can be asked questions later.
+
+    Each item in `papers` needs at least `id`, `title`, and `summary` (and ideally
+    `authors` and `url`). Already-indexed papers are skipped.
+
+    Returns {"indexed": <how many new>, "total": <collection size>}.
+    """
+    return rag.index_papers(topic, papers)
+
+
+@mcp.tool()
+def semantic_search(topic: str, query: str, k: int = 5) -> list[dict]:
+    """Find the k papers most relevant to a question using vector similarity.
+
+    Returns a list of {id, title, url, authors, text, distance} (smaller distance =
+    closer match). Use the returned text and url to write a cited answer. Returns []
+    if nothing has been indexed for this topic yet.
+    """
+    return rag.query(topic, query, k)
 
 
 def _selftest(topic: str) -> None:
