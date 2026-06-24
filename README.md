@@ -10,6 +10,8 @@
 
 Research Radar is a multi-agent system built with [Google's Agent Development Kit (ADK)](https://google.github.io/adk-docs/). It scouts arXiv for the most relevant recent work on a topic, evaluates and ranks each paper, synthesizes a structured Markdown brief, and remembers what it already showed you so every re-run surfaces *new* literature.
 
+You can also **ask questions about the papers**: it embeds them into a local **vector database (ChromaDB)** and answers with citations (a full **RAG** pipeline). A small **web UI** wraps both the brief and the Q&A.
+
 > Built for the Kaggle **AI Agents: Intensive Vibe Coding Capstone** (Freestyle track).
 
 ---
@@ -33,6 +35,16 @@ Research Radar treats literature review as a **pipeline of specialized agents**,
 The agents never touch arXiv or the filesystem directly - they go through a **custom MCP (Model Context Protocol) server**, which is the project's single trusted tool boundary. Each agent is granted *only* the tools it needs (least privilege).
 
 The result: re-run the same topic next week and Scout silently skips everything you've already read, so the brief is always "what's new for *you*."
+
+### Ask the papers (RAG)
+
+Beyond the brief, a fourth agent answers questions about a topic's papers:
+
+| Agent | Role | Tools |
+|-------|------|-------|
+| **Researcher** | Answers a question using only the retrieved papers, with inline citations; says "I don't know" if the papers don't cover it | `semantic_search` (MCP) |
+
+It works as a classic **RAG** pipeline: the papers' abstracts are embedded with Gemini embeddings (`gemini-embedding-001`, using `RETRIEVAL_DOCUMENT`/`RETRIEVAL_QUERY` task types) and stored in a persistent **ChromaDB** vector store; a question is embedded and the closest papers are retrieved and handed to the Researcher to answer with sources.
 
 ---
 
@@ -84,9 +96,11 @@ user topic
 
 ## Course concepts demonstrated
 
-- ✅ **Agent / Multi-agent system (ADK)** - `SequentialAgent` orchestrating three `LlmAgent` specialists with state hand-off.
-- ✅ **MCP Server** - a custom `FastMCP` server (`mcp_server/server.py`) exposing four tools over stdio, consumed by ADK via `MCPToolset`.
-- ✅ **Security features** - secrets kept in `.env` (git-ignored, never in code); per-agent least-privilege tool scoping; input validation and caps in every MCP tool (max results, topic length, brief size); the agents cannot read arbitrary files - only the MCP tools' fixed `data/` paths.
+- ✅ **Agent / Multi-agent system (ADK)** - a `SequentialAgent` orchestrating three `LlmAgent` specialists with state hand-off, plus a standalone Researcher agent for Q&A.
+- ✅ **MCP Server** - a custom `FastMCP` server (`mcp_server/server.py`) exposing six tools over stdio (arXiv search, dedupe/brief store, and RAG index/search), consumed by ADK via `McpToolset`.
+- ✅ **RAG & embeddings** - papers are embedded with Gemini embeddings and stored in a persistent **ChromaDB** vector database; questions are answered by semantic retrieval plus cited generation (`mcp_server/rag.py`, `ask.py`).
+- ✅ **Security features** - secrets in `.env` (git-ignored, never in code); per-agent least-privilege tool scoping; input caps in every MCP tool; agents have no arbitrary file or network access beyond the fixed tools.
+- ✅ **Deployability** - containerized (`Dockerfile`) for Google Cloud Run (see Deployment).
 - ➕ **Antigravity** - developed/iterated in Google's Antigravity IDE (shown in the demo video).
 
 ---
@@ -130,6 +144,18 @@ The brief prints to the console and is saved to `data/briefs/`. Run the same top
 adk web
 ```
 Then open the printed URL, pick `research_radar`, and type a topic. The UI shows each agent and tool call in sequence - great for understanding the flow.
+
+**Ask the papers (RAG):**
+```bash
+python ask.py "retrieval augmented generation evaluation" "What metrics evaluate RAG systems?"
+```
+On first use for a topic it indexes the papers (embeds their abstracts into ChromaDB), then answers your question with citations. Re-asking reuses the index; pass `--reindex` to refresh.
+
+**Web UI:**
+```bash
+streamlit run app.py
+```
+Opens a browser app with two tabs: generate a brief, or ask the papers.
 
 > **Model note:** the default model is `gemini-2.5-flash-lite` (fast, generous free tier). For the highest-quality brief, set `GEMINI_MODEL=gemini-2.5-flash` in `.env` (smaller free quota).
 
@@ -180,18 +206,23 @@ variable or secret at run time.
 ```
 .
 ├── research_radar/          # ADK agent package
-│   ├── agent.py             # root_agent: Scout → Analyst → Briefer + MCP wiring
+│   ├── agent.py             # root_agent (Scout → Analyst → Briefer) + Researcher
 │   ├── prompts.py           # per-agent instructions
+│   ├── errors.py            # shared, user-friendly error handling
 │   └── __init__.py
 ├── mcp_server/
-│   └── server.py            # FastMCP server: arXiv search + brief/seen store
+│   ├── server.py            # FastMCP server: arXiv search + brief/seen store + RAG tools
+│   └── rag.py               # ChromaDB vector store + Gemini embeddings
 ├── tests/                   # offline unit tests (pytest)
 │   ├── test_server.py
-│   └── test_agent.py
+│   ├── test_agent.py
+│   └── test_rag.py
 ├── examples/
 │   └── sample-brief.md      # a real generated brief
 ├── .github/workflows/ci.yml # runs the tests on every push (GitHub Actions)
-├── radar.py                 # CLI runner (argparse + graceful error handling)
+├── radar.py                 # CLI: generate a brief
+├── ask.py                   # CLI: ask the papers (RAG)
+├── app.py                   # Streamlit web UI (brief + ask)
 ├── Dockerfile               # container image (Cloud Run ready)
 ├── data/                    # generated briefs + dedupe state (git-ignored)
 ├── requirements.txt         # runtime dependencies
