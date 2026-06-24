@@ -31,3 +31,10 @@ def test_least_privilege_tooling():
     # Scout and Briefer each get a toolset (search vs. write).
     assert by_name["Scout"].tools
     assert by_name["Briefer"].tools
+
+
+def test_researcher_agent_is_wired():
+    # The standalone RAG agent used by ask.py.
+    assert agent.researcher.name == "Researcher"
+    assert agent.researcher.output_key == "answer"
+    assert agent.researcher.tools  # has the semantic_search toolset

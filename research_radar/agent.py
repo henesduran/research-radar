@@ -91,6 +91,17 @@ briefer = LlmAgent(
     output_key="brief",
 )
 
+# Standalone RAG agent (used by ask.py, not part of the brief pipeline). It answers
+# questions using only the papers retrieved from the vector store via semantic_search.
+researcher = LlmAgent(
+    name="Researcher",
+    model=MODEL,
+    description="Answers questions about a topic using retrieved papers, with citations.",
+    instruction=prompts.RESEARCHER_INSTRUCTION,
+    tools=[_toolset(["semantic_search"])],
+    output_key="answer",
+)
+
 # The root agent ADK looks for. Runs Scout -> Analyst -> Briefer in sequence.
 # Note: ADK 2.3 emits a forward-looking deprecation pointing to a future "Workflow"
 # API that does not exist in this version yet, so SequentialAgent remains the correct
