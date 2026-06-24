@@ -42,7 +42,7 @@ Beyond the brief, a fourth agent answers questions about a topic's papers:
 
 | Agent | Role | Tools |
 |-------|------|-------|
-| **Researcher** | Answers a question using only the retrieved papers, with inline citations; says "I don't know" if the papers don't cover it | `semantic_search` (MCP) |
+| **Researcher** | Answers a question using only the retrieved papers, with inline citations; says "I don't know" if the papers don't cover it | `semantic_search` (vector search) |
 
 It works as a classic **RAG** pipeline: the papers' abstracts are embedded with Gemini embeddings (`gemini-embedding-001`, using `RETRIEVAL_DOCUMENT`/`RETRIEVAL_QUERY` task types) and stored in a persistent **ChromaDB** vector store; a question is embedded and the closest papers are retrieved and handed to the Researcher to answer with sources.
 
@@ -169,6 +169,8 @@ A real brief produced by `python radar.py "graph neural networks for drug discov
 >
 > **Top Papers**: RAG-Enhanced Collaborative LLM Agents for Drug Discovery, Domain Knowledge Infused Conditional Generative Models, MECCH (Metapath Context Convolution HGNNs), Transformers are Graph Neural Networks, and more.
 
+A real RAG answer (`python ask.py "..." "What metrics evaluate RAG systems?"`) with inline citations is saved in [`examples/sample-answer.md`](examples/sample-answer.md).
+
 ## Testing
 
 Unit tests cover the MCP server's logic (input clamping, dedupe, state) and the
@@ -218,7 +220,8 @@ variable or secret at run time.
 │   ├── test_agent.py
 │   └── test_rag.py
 ├── examples/
-│   └── sample-brief.md      # a real generated brief
+│   ├── sample-brief.md      # a real generated brief
+│   └── sample-answer.md     # a real cited RAG answer
 ├── .github/workflows/ci.yml # runs the tests on every push (GitHub Actions)
 ├── radar.py                 # CLI: generate a brief
 ├── ask.py                   # CLI: ask the papers (RAG)
